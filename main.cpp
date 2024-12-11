@@ -58,46 +58,83 @@ Purpose:  This project will show you the difference between member functions and
 #include <string>
 struct T
 {
-    T(<#type name#> v, const char* <#variable name#>)   //1
-    //2
-    //3
+    int value = 0; // 2
+    std::string name = ""; // 3
+
+    T (int val, const char* charPtr)   // 1
+    {
+        value = val;
+        name = charPtr;
+    }
 };
 
-struct <#structName1#>                                //4
+struct F                               // 4
 {
-    <#type name#> compare(<#type name#> a, <#type name#> b) //5
+    T* compare (T* a, T* b) // 5
     {
-        if( a->value < b->value ) return a;
-        if( a->value > b->value ) return b;
+        if (a != nullptr && b != nullptr)
+        {
+            if (a->value < b->value) return a;
+            if (a->value > b->value) return b;
+        }
+        
         return nullptr;
     }
 };
 
 struct U
 {
-    float <#name1#> { 0 }, <#name2#> { 0 };
-    <#returnType#> <#memberFunction#>(<#type name#>* <#updatedValue#>)      //12
+    float height { 0.0f }, width { 0.0f };
+    
+    float almostSquare (float* newValue)      // 12
     {
+        if (newValue == nullptr)
+        {
+            std::cout << "The argument passed to almostSquare was nullptr." << std::endl;
+       
+            return 0.0f;
+        }
         
+        std::cout << "U's height value: " << this->height << std::endl;
+        this->height = *newValue;
+        std::cout << "U's height updated value: " << this->height << std::endl;
+
+        while (std::abs (this->width - this->height) > 0.001f)
+        {
+            // shrink the distance between this->width and this->height
+            this->width += this->height / 1000.0f;
+        }
+
+        std::cout << "U's width updated value: " << this->width << std::endl;
+        
+        return this->width * this->height;
     }
 };
 
-struct <#structname2#>
+struct I
 {
-    static <#returntype#> <#staticFunctionA#>(U* that, <#type name#>* <#updatedValue#> )        //10
+    static float almostSquare (U* that, float* newValue)        // 10
     {
-        std::cout << "U's <#name1#> value: " << that-><#name1#> << std::endl;
-        that-><#name1#> = <#updatedValue#>;
-        std::cout << "U's <#name1#> updated value: " << that-><#name1#> << std::endl;
-        while( std::abs(that-><#name2#> - that-><#name1#>) > 0.001f )
+        if (that == nullptr || newValue == nullptr)
         {
-            /*
-             write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
-             */
-            that-><#name2#> += ;
+            std::cout << "One or both of the arguments passed to almostSquare was nullptr." <<  std::endl;
+            
+            return 0;            
         }
-        std::cout << "U's <#name2#> updated value: " << that-><#name2#> << std::endl;
-        return that-><#name2#> * that-><#name1#>;
+        
+        std::cout << "U's height value: " << that->height << std::endl;
+        that->height = *newValue;
+        std::cout << "U's height updated value: " << that->height << std::endl;
+        
+        while (std::abs (that->width - that->height) > 0.001f)
+        {
+            // shrink the distance between that->width and that->height
+            that->width += that->height / 1000.0f;
+        }
+            
+        std::cout << "U's width updated value: " << that->width << std::endl;
+        
+        return that->width * that->height;
     }
 };
         
@@ -117,17 +154,28 @@ struct <#structname2#>
 
 int main()
 {
-    T <#name1#>( , );                                             //6
-    T <#name2#>( , );                                             //6
+    T t1 (1, "one");                                             // 6
+    T t2 (2, "two");                                             // 6
     
-    <#structName1#> f;                                            //7
-    auto* smaller = f.compare( , );                              //8
-    std::cout << "the smaller one is << " << smaller->name << std::endl; //9
+    F f;                                                        // 7
     
-    U <#name3#>;
-    float updatedValue = 5.f;
-    std::cout << "[static func] <#name3#>'s multiplied values: " << <#structname2#>::<#staticFunctionA#>( , ) << std::endl;                  //11
+    auto* smaller = f.compare (&t1, &t2);                       // 8
     
-    U <#name4#>;
-    std::cout << "[member func] <#name4#>'s multiplied values: " << <#name4#>.<#memberFunction#>( &updatedValue ) << std::endl;
+    if (smaller == nullptr)
+    {
+        std::cout << "f.compare returned nullptr" << std::endl;
+        std::cout << "the values of the compared items may be equal" << std::endl;
+        std::cout << "or one or both of the compared items is equal to nullptr" << std::endl;
+    }
+    else
+    {
+        std::cout << "the smaller one is << " << smaller->name << std::endl; // 9    
+    }    
+    
+    U u1;
+    float updatedValue = 5.0f;
+    std::cout << "[static func] u1's multiplied values: " << I::almostSquare (&u1, &updatedValue) << std::endl;                  // 11
+    
+    U u2;
+    std::cout << "[member func] u2's multiplied values: " << u2.almostSquare (&updatedValue) << std::endl;
 }
