@@ -37,14 +37,10 @@ struct T
 
 struct F                               // 4
 {
-    T* compare (T* a, T* b) // 5
+    T* compare (T& a, T& b) // 5
     {
-        if (a != nullptr && b != nullptr)
-        {
-            if (a->value < b->value) return a;
-            if (a->value > b->value) return b;
-        }
-        
+        if (a.value < b.value) return &a;
+        if (a.value > b.value) return &b;
         return nullptr;
     }
 };
@@ -53,17 +49,10 @@ struct U
 {
     float height { 0.0f }, width { 0.0f };
     
-    float almostSquare (float* newValue)      // 12
+    float almostSquare (const float& newValue)      // 12
     {
-        if (newValue == nullptr)
-        {
-            std::cout << "The argument passed to almostSquare was nullptr." << std::endl;
-       
-            return 0.0f;
-        }
-        
         std::cout << "U's height value: " << this->height << std::endl;
-        this->height = *newValue;
+        this->height = newValue;
         std::cout << "U's height updated value: " << this->height << std::endl;
 
         while (std::abs (this->width - this->height) > 0.001f)
@@ -80,28 +69,21 @@ struct U
 
 struct I
 {
-    static float almostSquare (U* that, float* newValue)        // 10
+    static float almostSquare (U& that, const float& newValue)        // 10
     {
-        if (that == nullptr || newValue == nullptr)
-        {
-            std::cout << "One or both of the arguments passed to almostSquare was nullptr." <<  std::endl;
-            
-            return 0;            
-        }
+        std::cout << "U's height value: " << that.height << std::endl;
+        that.height = newValue;
+        std::cout << "U's height updated value: " << that.height << std::endl;
         
-        std::cout << "U's height value: " << that->height << std::endl;
-        that->height = *newValue;
-        std::cout << "U's height updated value: " << that->height << std::endl;
-        
-        while (std::abs (that->width - that->height) > 0.001f)
+        while (std::abs (that.width - that.height) > 0.001f)
         {
             // shrink the distance between that->width and that->height
-            that->width += that->height / 1000.0f;
+            that.width += that.height / 1000.0f;
         }
             
-        std::cout << "U's width updated value: " << that->width << std::endl;
+        std::cout << "U's width updated value: " << that.width << std::endl;
         
-        return that->width * that->height;
+        return that.width * that.height;
     }
 };
         
@@ -126,13 +108,12 @@ int main()
     
     F f;                                                        // 7
     
-    auto* smaller = f.compare (&t1, &t2);                       // 8
+    auto* smaller = f.compare (t1, t2);                       // 8
     
     if (smaller == nullptr)
     {
         std::cout << "f.compare returned nullptr" << std::endl;
-        std::cout << "the values of the compared items may be equal" << std::endl;
-        std::cout << "or one or both of the compared items is equal to nullptr" << std::endl;
+        std::cout << "the values of the compared items are equal" << std::endl;
     }
     else
     {
@@ -141,8 +122,8 @@ int main()
     
     U u1;
     float updatedValue = 5.0f;
-    std::cout << "[static func] u1's multiplied values: " << I::almostSquare (&u1, &updatedValue) << std::endl;                  // 11
+    std::cout << "[static func] u1's multiplied values: " << I::almostSquare (u1, updatedValue) << std::endl;                  // 11
     
     U u2;
-    std::cout << "[member func] u2's multiplied values: " << u2.almostSquare (&updatedValue) << std::endl;
+    std::cout << "[member func] u2's multiplied values: " << u2.almostSquare (updatedValue) << std::endl;
 }
