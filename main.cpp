@@ -61,11 +61,7 @@ struct T
     int value = 0; // 2
     std::string name = ""; // 3
 
-    T (int val, const char* charPtr)   // 1
-    {
-        value = val;
-        name = charPtr;
-    }
+    T (int val, const char* charPtr) : value{val}, name{charPtr} {}
 };
 
 struct F                               // 4
